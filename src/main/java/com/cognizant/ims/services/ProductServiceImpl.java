@@ -115,7 +115,7 @@ public class ProductServiceImpl implements ProductService {
 		try {
 			if (productId != null) {
 				productRepository.deleteById(productId);
-				response.setMessage("Product deleted from the inventory successfully.");
+				response.setMessage(String.format("Product of id  %d deleted from the inventory successfully.", productId));
 			} else {
 				response.setMessage("Product id should not be null.");
 			}

@@ -5,6 +5,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,7 +32,7 @@ public class ProductController {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ProductController.class);
 
-	@GetMapping("")
+	@GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Get all available products from the inventory.", notes = "This service returns all available products. "
 			+ "\nStatus of the operation is mentioned in the field message")
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success", response = ResponseBean.class),
@@ -50,7 +51,7 @@ public class ProductController {
 
 	}
 
-	@GetMapping("/{productId}")
+	@GetMapping(value = "/{productId}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Get details of a specific product from the inventory.", notes = "This call returns a particular product based on the product id given in the url. ")
 	public ResponseBean<ProductDto> getProduct(@PathVariable Integer productId) {
 		LOGGER.debug("Received request to return details of product with id {}", productId);
@@ -65,7 +66,7 @@ public class ProductController {
 		return response;
 	}
 
-	@PutMapping("/updateProduct")
+	@PutMapping(value = "/updateProduct", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Updates an existing product in the inventory", notes = "This call updates the existing product's name and description by the product id ")
 	public ResponseBean<ProductDto> updateProduct(@RequestBody ProductDto productDto) {
 		LOGGER.debug("Received request to update details of product with id {}", productDto.getProductId());
@@ -80,7 +81,7 @@ public class ProductController {
 		return response;
 	}
 
-	@DeleteMapping("/delete/{id}")
+	@DeleteMapping(value = "/delete/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Deletes an existing product from the inventory", notes = "This call permanently removes the product from the inventory by the product id "
 			+ "\nStatus of the operation is mentioned in the field message")
 	public ResponseBean<ProductDto> deleteProduct(@PathVariable(value = "id") Integer productId) {
@@ -88,13 +89,11 @@ public class ProductController {
 		ResponseBean<ProductDto> response = new ResponseBean<>();
 		try {
 			productService.deleteProduct(productId, response);
-		}
-		catch(ProductNotFoundException prodNotFoundException) {
+		} catch (ProductNotFoundException prodNotFoundException) {
 			LOGGER.error(prodNotFoundException.getMessage());
 			response.setMessage(prodNotFoundException.getMessage());
 			response.setReturnCode(1);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			LOGGER.error(e.getMessage());
 			response.setMessage(e.getMessage());
 			response.setReturnCode(1);

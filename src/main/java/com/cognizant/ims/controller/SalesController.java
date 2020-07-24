@@ -3,6 +3,7 @@ package com.cognizant.ims.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,7 +26,7 @@ public class SalesController {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SalesController.class);
 
-	@PatchMapping("/{productId}")
+	@PatchMapping(value = "/{productId}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Sell a product from the inventory.", notes = "This service updates the sales count and stock of a product. If the product does not exists throws an exception")
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success", response = ResponseBean.class),
 			@ApiResponse(code = 401, message = "Unauthorized"), @ApiResponse(code = 500, message = "Failure") })

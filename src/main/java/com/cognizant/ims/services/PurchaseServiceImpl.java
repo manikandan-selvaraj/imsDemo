@@ -37,9 +37,10 @@ public class PurchaseServiceImpl implements PurchaseService {
 				int newStock = product.getStock() + productDto.getStock();
 				product.setStock(newStock);
 				productRepository.save(product);
+				productDto.setProductId(product.getId());
 				response.setData(productDto);
 				response.setMessage(String.format("Stock of product %s is increased to %d ", productDto.getName(),
-						productDto.getStock()));
+						newStock));
 				LOGGER.info("Stock of product {} is increased to {} ", productDto.getName(), newStock);
 			} else {
 				Product newProduct = new Product();
@@ -48,6 +49,7 @@ public class PurchaseServiceImpl implements PurchaseService {
 				newProduct.setSalesCount(0);
 				newProduct.setStock(productDto.getStock());
 				productRepository.save(newProduct);
+				productDto.setProductId(newProduct.getId());
 				response.setData(productDto);
 				response.setMessage("Product created successfully with id  " + newProduct.getId());
 				LOGGER.info(" New product is created with id {} ", newProduct.getId());

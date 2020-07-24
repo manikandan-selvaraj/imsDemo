@@ -7,7 +7,16 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Product implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -18,58 +27,5 @@ public class Product implements Serializable {
 	private String description;
 	private int stock;
 	private int salesCount;
-
-	public Product() {
-		super();
-	}
-
-	public Product(int id, String name, String description, int stock, int salesCount) {
-		super();
-		this.id = id;
-		this.name = name;
-		this.description = description;
-		this.stock = stock;
-		this.salesCount = salesCount;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public int getStock() {
-		return stock;
-	}
-
-	public void setStock(int stock) {
-		this.stock = stock;
-	}
-
-	public int getSalesCount() {
-		return salesCount;
-	}
-
-	public void setSalesCount(int salesCount) {
-		this.salesCount = salesCount;
-	}
 
 }
