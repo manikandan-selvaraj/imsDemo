@@ -5,18 +5,24 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.cognizant.ims.common.ResponseBean;
 import com.cognizant.ims.dto.ProductDto;
 import com.cognizant.ims.exception.ProductNotFoundException;
+import com.cognizant.ims.services.AmazonClientService;
 import com.cognizant.ims.services.ProductService;
 
 import io.swagger.annotations.ApiOperation;
@@ -29,6 +35,9 @@ public class ProductController {
 
 	@Autowired
 	private ProductService productService;
+
+	@Autowired
+	private AmazonClientService amazonClient;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ProductController.class);
 
@@ -101,4 +110,23 @@ public class ProductController {
 		return response;
 	}
 
+	@PostMapping("/uploadFile")
+	public ResponseEntity<String> uploadFile(@RequestPart(value = "file") MultipartFile file) {
+		try {
+			amazonClient.uploadFileToS3Bucket(file);
+		} catch (Exception e) {
+			return new ResponseEntity<>("File uploaded failed", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		return new ResponseEntity<>("File uploaded successfully", HttpStatus.OK);
+	}
+
+	@DeleteMapping("/deleteFile")
+	public ResponseEntity<String> deleteFile(@RequestPart(value = "file_name") String fileName) {
+		try {
+			this.amazonClient.deleteFileFromS3Bucket(fileName);
+		} catch (Exception e) {
+			return new ResponseEntity<>("File deletion failed", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		return new ResponseEntity<>("File deleted successfully", HttpStatus.OK);
+	}
 }

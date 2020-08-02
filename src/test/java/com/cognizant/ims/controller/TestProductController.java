@@ -2,8 +2,6 @@ package com.cognizant.ims.controller;
 
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -43,12 +41,11 @@ public class TestProductController {
 
 	@MockBean
 	private ProductService productService;
-	
+
 	@Before()
-	public void setup()
-	{
-	    //Init MockMvc Object and build
-	    mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+	public void setup() {
+		// Init MockMvc Object and build
+		mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 	}
 
 	@Test
@@ -76,16 +73,15 @@ public class TestProductController {
 	@Test
 	@WithMockUser(username = "admin", password = "admin")
 	public void testUpdateProduct() throws Exception {
-		ProductDto input = new ProductDto(2,"tests","sample",345,678);
-        ObjectMapper mapper = new ObjectMapper();
-        String json = mapper.writeValueAsString(input);
+		ProductDto input = new ProductDto(2, "tests", "sample", 345, 678);
+		ObjectMapper mapper = new ObjectMapper();
+		String json = mapper.writeValueAsString(input);
 		doNothing().when(productService).updateProduct(Mockito.any(), Mockito.any());
 		MockHttpServletRequestBuilder request = put("/products/updateProduct");
 		request.content(json);
 		request.accept(MediaType.APPLICATION_JSON);
 		request.contentType(MediaType.APPLICATION_JSON);
-		mockMvc.perform(request)
-		    .andExpect(status().isOk());
+		mockMvc.perform(request).andExpect(status().isOk());
 	}
 
 	@Test

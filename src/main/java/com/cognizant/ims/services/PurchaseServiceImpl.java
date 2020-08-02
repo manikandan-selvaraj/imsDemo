@@ -6,9 +6,15 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.amazonaws.auth.AWSCredentialsProvider;
+import com.amazonaws.regions.Region;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.sqs.AmazonSQS;
+import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
 import com.cognizant.ims.common.ResponseBean;
 import com.cognizant.ims.dto.ProductDto;
 import com.cognizant.ims.entities.Product;
@@ -22,7 +28,24 @@ public class PurchaseServiceImpl implements PurchaseService {
 	@Autowired
 	private ProductRepository productRepository;
 
+	@Value("${sqs.url}")
+	private String sqsUrl;
+
+	private AmazonSQS amazonSqs;
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(PurchaseServiceImpl.class);
+	
+	public PurchaseServiceImpl() {
+		super();
+	}
+
+	@Autowired
+	public PurchaseServiceImpl(Region awsRegion, AWSCredentialsProvider awsCredentialsProvider, String awsS3Bucket) {
+		this.amazonSqs = AmazonSQSClientBuilder.standard().withCredentials(awsCredentialsProvider).build();
+
+		AmazonS3ClientBuilder.standard().withCredentials(awsCredentialsProvider).withRegion(awsRegion.getName())
+				.build();
+	}
 
 	@Override
 	public void addProduct(ProductDto productDto, ResponseBean<ProductDto> response) throws ServiceException {
@@ -39,8 +62,8 @@ public class PurchaseServiceImpl implements PurchaseService {
 				productRepository.save(product);
 				productDto.setProductId(product.getId());
 				response.setData(productDto);
-				response.setMessage(String.format("Stock of product %s is increased to %d ", productDto.getName(),
-						newStock));
+				response.setMessage(
+						String.format("Stock of product %s is increased to %d ", productDto.getName(), newStock));
 				LOGGER.info("Stock of product {} is increased to {} ", productDto.getName(), newStock);
 			} else {
 				Product newProduct = new Product();
@@ -54,6 +77,9 @@ public class PurchaseServiceImpl implements PurchaseService {
 				response.setMessage("Product created successfully with id  " + newProduct.getId());
 				LOGGER.info(" New product is created with id {} ", newProduct.getId());
 			}
+
+			this.amazonSqs.sendMessage(this.sqsUrl, response.getMessage());
+
 		}
 
 	}

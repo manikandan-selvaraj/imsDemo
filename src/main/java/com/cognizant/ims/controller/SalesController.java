@@ -26,7 +26,7 @@ public class SalesController {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SalesController.class);
 
-	@PatchMapping(value = "/{productId}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PatchMapping(value = "/{productId}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Sell a product from the inventory.", notes = "This service updates the sales count and stock of a product. If the product does not exists throws an exception")
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success", response = ResponseBean.class),
 			@ApiResponse(code = 401, message = "Unauthorized"), @ApiResponse(code = 500, message = "Failure") })

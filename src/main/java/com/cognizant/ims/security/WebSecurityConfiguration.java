@@ -1,11 +1,14 @@
 package com.cognizant.ims.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
@@ -17,18 +20,27 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 	@Autowired
 	public void configureSecurity(AuthenticationManagerBuilder auth) throws Exception {
 
-		auth.inMemoryAuthentication().withUser("customer").password("{noop}customer").roles(USER_ROLE).and()
-				.withUser("admin").password("{noop}admin").roles(USER_ROLE, ADMIN_ROLE);
+		auth.inMemoryAuthentication().withUser("customer").password(passwordEncoder().encode("customer"))
+				.roles(USER_ROLE).and().withUser("admin").password(passwordEncoder().encode("admin"))
+				.roles(USER_ROLE, ADMIN_ROLE);
 	}
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.csrf().disable().authorizeRequests()
-				.antMatchers(HttpMethod.POST, BASE_PRODUCT_PATH, "/purchase/addProduct").hasRole(ADMIN_ROLE)
-				.antMatchers(HttpMethod.PUT, BASE_PRODUCT_PATH).hasRole(ADMIN_ROLE)
-				.antMatchers(HttpMethod.PATCH, BASE_PRODUCT_PATH, "/sale/**").hasRole(ADMIN_ROLE)
-				.antMatchers(HttpMethod.DELETE, BASE_PRODUCT_PATH).hasRole(ADMIN_ROLE).anyRequest()
-				.hasAnyRole(USER_ROLE, ADMIN_ROLE).and().formLogin().and().httpBasic();
+				/*
+				 * .antMatchers(HttpMethod.POST, BASE_PRODUCT_PATH,
+				 * "/purchase/addProduct").hasRole(ADMIN_ROLE) .antMatchers(HttpMethod.PUT,
+				 * BASE_PRODUCT_PATH).hasRole(ADMIN_ROLE) .antMatchers(HttpMethod.PATCH,
+				 * BASE_PRODUCT_PATH, "/sale/**").hasRole(ADMIN_ROLE)
+				 * .antMatchers(HttpMethod.DELETE, BASE_PRODUCT_PATH)
+				 .hasRole(ADMIN_ROLE)*/.anyRequest()
+				.permitAll().and().formLogin().and().httpBasic();
+	}
+
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
 	}
 
 }

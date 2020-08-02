@@ -1,9 +1,7 @@
 package com.cognizant.ims.controller;
 
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.Before;
@@ -18,7 +16,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -44,25 +41,23 @@ public class TestPurchaseController {
 
 	@MockBean
 	private PurchaseService purchaseService;
-	
+
 	@Before()
-	public void setup()
-	{
-	    mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+	public void setup() {
+		mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 	}
 
 	@Test
 	@WithMockUser(username = "admin", password = "admin")
 	public void testAddProduct() throws Exception {
-		ProductDto input = new ProductDto(1,"tests","sample",345,678);
-        ObjectMapper mapper = new ObjectMapper();
-        String json = mapper.writeValueAsString(input);
+		ProductDto input = new ProductDto(1, "tests", "sample", 345, 678);
+		ObjectMapper mapper = new ObjectMapper();
+		String json = mapper.writeValueAsString(input);
 		MockHttpServletRequestBuilder request = post("/purchase/addProduct");
 		request.content(json);
 		request.accept(MediaType.APPLICATION_JSON);
 		request.contentType(MediaType.APPLICATION_JSON);
-		mockMvc.perform(request)
-		    .andExpect(status().isOk());
+		mockMvc.perform(request).andExpect(status().isOk());
 	}
 
 	@Test
